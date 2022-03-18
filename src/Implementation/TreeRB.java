@@ -52,7 +52,7 @@ public class TreeRB<T extends Comparable> implements IRedBLackTree<T> {
     private Node<T> deleteNode(T value, Node<T> node){
         int result = node.getValue().compareTo(value);
         boolean deletedSuccessfully = false;
-        Node<T> deleted = node, replacing = null, parent = node.getParent();
+        Node<T> deleted = node, replacing = null, parent = node.getParent(), temp = null;
         if(result > 0 && node.hasLeftChild()) {return deleteNode(value, node.getLeftChild());}
         if(result < 0 && node.hasRightChild()) {return deleteNode(value, node.getRightChild());}
         else if(result == 0){
@@ -73,20 +73,23 @@ public class TreeRB<T extends Comparable> implements IRedBLackTree<T> {
                 replacing.setParent(parent);
                 if(deleted.isLeft()) parent.setLeftChild(replacing);
                 else parent.setRightChild(replacing);
-            }
-            if(replacing != null) replacing = replacing.rebalanceDeletion(deleted);
-            else{
-                replacing = deleted.getParent();
+            } else{
+                temp = new Node(0);
+                temp.setColor(false);
+                replacing = temp;
+                replacing.setParent(parent);
                 boolean left = false;
-                if(replacing != null){
-                    left = node.isLeft();
-                    if(left) replacing.setLeftChild(null);
-                    else replacing.setRightChild(null);
-                }
-                else {
-                    System.out.println(deletedSuccessfully);
-                    return null;
-                }
+                if(parent != null) left = deleted.isLeft();
+                if(left) parent.setLeftChild(replacing);
+                else parent.setRightChild(replacing);
+            }
+            replacing = replacing.rebalanceDeletion(deleted);
+            if(temp != null){
+                if(parent == null) return null;
+                boolean left = temp.isLeft();
+                if(left) parent.setLeftChild(null);
+                else parent.setRightChild(null);
+                replacing = parent;
             }
         }
         System.out.println(deletedSuccessfully);
