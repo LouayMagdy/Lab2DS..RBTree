@@ -1,6 +1,6 @@
 package Implementation;
 
-public class TreeRB<T extends Comparable> implements IRedBLackTree<T> {
+public class TreeRB<T extends Comparable<T>> implements IRedBLackTree<T> {
     public Node<T> root;
     boolean balance;
     boolean nodeIsLeft;
@@ -38,7 +38,7 @@ public class TreeRB<T extends Comparable> implements IRedBLackTree<T> {
         if (node == null) {
             return null;
         }
-        if(node.getValue() == value) return node;
+        if(node.getValue().equals(value)) return node;
         int result = node.getValue().compareTo(value);
         if(result > 0) {
             return search(value, node.getLeftChild());
@@ -94,7 +94,7 @@ public class TreeRB<T extends Comparable> implements IRedBLackTree<T> {
             return node.rebalance(parentIsLeft, nodeIsLeft);
         }
         if(node.isRed() && node != this.root) {
-            if((nodeIsLeft && !node.getLeftChild().isRed()) || (!nodeIsLeft && !node.getRightChild().isRed()))
+            if((nodeIsLeft && node.hasLeftChild() && !node.getLeftChild().isRed()) || (!nodeIsLeft && node.hasRightChild() && !node.getRightChild().isRed()))
                 return node;
             Node<T> uncle = getUncle(node);
             // "node" is the parent
@@ -147,15 +147,15 @@ public class TreeRB<T extends Comparable> implements IRedBLackTree<T> {
                 replacing = node.getLeftChild();
                 if(replacing == null) replacing = node.getRightChild();
                 replacing.setParent(parent);
-                if(deleted.isLeft()) {
+                if(deleted.getParent() != null && deleted.isLeft()) {
                     parent.setLeftChild(replacing);
                     left  = true;
                 }
-                else parent.setRightChild(replacing);
+                else if(parent != null) parent.setRightChild(replacing);
             }
 
             if(!(node.hasRightChild() || node.hasLeftChild()) || replacing == null){
-                temp = new Node(0);
+                temp = new Node("0");
                 temp.setColor(false);
                 replacing = temp;
                 replacing.setParent(parent);
@@ -163,8 +163,8 @@ public class TreeRB<T extends Comparable> implements IRedBLackTree<T> {
                 if(!(node.hasRightChild() || node.hasLeftChild())) {
                     if(parent != null) left = deleted.isLeft();
                 }
-                if(left) parent.setLeftChild(replacing);
-                else parent.setRightChild(replacing);
+                if(left && parent != null) parent.setLeftChild(replacing);
+                else if ( parent != null)parent.setRightChild(replacing);
             }
 //            if (replacing != null)
             replacing = replacing.rebalanceDeletion(deleted);
