@@ -76,6 +76,25 @@ public class Node<T extends Comparable>{
         return leftChild;
     }
 
+    public Node<T> rebalance(boolean parentIsLeft, boolean nodeIsLeft) {
+        // node
+        if(parentIsLeft && nodeIsLeft) {
+            this.setColor(true);
+            this.getLeftChild().setColor(false);
+            return this.rotateRight();
+        } else if (!parentIsLeft && !nodeIsLeft) {
+            this.setColor(true);
+            this.getRightChild().setColor(false);
+            return this.rotateLeft();
+        } else if (parentIsLeft) {
+            this.getLeftChild().rotateLeft();
+            return this.rotateRight();
+        } else {
+            this.getRightChild().rotateRight();
+            return this.rotateLeft();
+        }
+    }
+
     public Node<T> rebalanceDeletion(Node<T> deleted){ // this caller node is u : replacer
         if(this.getParent() == null || (!this.isRed() ^ !deleted.isRed())) {
             this.setColor(false);

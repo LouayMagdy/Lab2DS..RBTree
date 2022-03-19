@@ -2,8 +2,11 @@ package Implementation;
 
 public class TreeRB<T extends Comparable> implements IRedBLackTree<T> {
     public Node<T> root;
+    boolean balance;
+    boolean nodeIsLeft;
+    boolean parentIsLeft;
 
-    public TreeRB() {this.root = null;}
+    public TreeRB() {this.root = null; balance = true; nodeIsLeft = true; parentIsLeft = true;}
 
     @Override
     public void getRoot() {
@@ -27,17 +30,85 @@ public class TreeRB<T extends Comparable> implements IRedBLackTree<T> {
 
     @Override
     public boolean contain(T value) { //////not implemented
-        return false;
+        Node<T> node = this.search(value, this.root);
+        return node != null;
     }
 
-    @Override
-    public Node<T> search(T value) { ////////not implemented
+    private Node<T> search(T value, Node<T> node) {
+        if (node == null) {
+            return null;
+        }
+        if(node.getValue() == value) return node;
+        int result = node.getValue().compareTo(value);
+        if(result > 0) {
+            return search(value, node.getLeftChild());
+        }else if(result < 0) {
+            return search(value, node.getRightChild());
+        }
         return null;
     }
 
     @Override
-    public void insert(T value) { ///////not implemented
+    public Node<T> search(T value) { ////////not implemented
+        return this.search(value, this.root);
+    }
 
+
+
+    @Override
+    public void insert(T value) { ///////not implemented
+        this.root = this.insert(value, this.root);
+        this.root.setColor(false);
+    }
+
+    private Node<T> getUncle(Node<T> node) {
+        Node<T> parent = node.getParent();
+        if(parent.getLeftChild() == node) {
+            return parent.getRightChild();
+        } else {
+            return parent.getLeftChild();
+        }
+    }
+
+
+
+    private Node<T> insert(T value, Node<T> node) {
+        if (node == null) {
+            return new Node<T>(value);
+        }
+
+        int result = node.getValue().compareTo(value);
+        if(result > 0) {
+            Node<T> left = insert(value, node.getLeftChild());
+            left.setParent(node);
+            node.setLeftChild(left);
+            nodeIsLeft = true;
+        }else if(result < 0) {
+            Node<T> right = insert(value, node.getRightChild());
+            right.setParent(node);
+            node.setRightChild(right);
+            nodeIsLeft = false;
+        }
+        if (!this.balance) {
+            this.balance = true;
+            return node.rebalance(parentIsLeft, nodeIsLeft);
+        }
+        if(node.isRed() && node != this.root) {
+            if((nodeIsLeft && !node.getLeftChild().isRed()) || (!nodeIsLeft && !node.getRightChild().isRed()))
+                return node;
+            Node<T> uncle = getUncle(node);
+            // "node" is the parent
+            if(uncle != null && uncle.isRed()) {
+                uncle.setColor(false);
+                node.setColor(false);
+                node.getParent().setColor(true);
+            } else {
+                this.balance = false;
+                Node<T> parent = node.getParent();
+                parentIsLeft = parent.getLeftChild() == node;
+            }
+        }
+        return node;
     }
 
     @Override
