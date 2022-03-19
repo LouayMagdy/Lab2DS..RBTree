@@ -106,17 +106,13 @@ public class Node<T extends Comparable>{
             else sibling = this.getParent().getLeftChild();
 
             if (sibling == null || (sibling != null && !sibling.isRed() &&
-                    ((sibling.hasLeftChild() && !sibling.getLeftChild().isRed()) || !sibling.hasLeftChild()) &&
-                    ((sibling.hasRightChild() && !sibling.getRightChild().isRed()) || !sibling.hasRightChild()))) {
+               ((sibling.hasLeftChild() && !sibling.getLeftChild().isRed()) || !sibling.hasLeftChild()) &&
+               ((sibling.hasRightChild() && !sibling.getRightChild().isRed()) || !sibling.hasRightChild()))) {
                 boolean blackParent = !parent.isRed();
                 this.getParent().setColor(false);
                 if (sibling != null) {
-
-                    if(this.isLeft()) {
-                        this.getParent().getRightChild().setColor(true);
-                    } else {
-                        this.getParent().getLeftChild().setColor(true);
-                    }
+                    if(this.isLeft()) this.getParent().getRightChild().setColor(true);
+                    else this.getParent().getLeftChild().setColor(true);
                 }
                 if (blackParent)
                     this.setParent(this.getParent().rebalanceDeletion(deleted));
@@ -125,17 +121,18 @@ public class Node<T extends Comparable>{
 
             else if (sibling != null && sibling.isRed()) {
                 sibling.swapColor(sibling.getParent());
+                Node<T> temp;
                 if (sibling.isLeft()) {
                     sibling = sibling.getParent().rotateRight();
-//                    sibling.getRightChild().setColor(false);
+                    temp = sibling.getRightChild().getRightChild();
                 } else {
                     sibling = sibling.getParent().rotateLeft();
-//                    sibling.getLeftChild().setColor(false);
+                    temp = sibling.getLeftChild().getLeftChild();
                 }
-                return sibling;
+                temp = temp.rebalanceDeletion(deleted);
+                return temp;
             }
-//            else if(sibling != null && !sibling.isRed())
-            else {
+            else if((sibling != null && !sibling.isRed())){
                 if (sibling.parent != null && sibling.isLeft() && sibling.hasRightChild() && sibling.getRightChild().isRed()
                    && ((sibling.hasLeftChild() && !sibling.getLeftChild().isRed()) || !sibling.hasLeftChild())) {
                     sibling.swapColor(sibling.getRightChild());
@@ -147,7 +144,7 @@ public class Node<T extends Comparable>{
                     sibling.getLeftChild().setColor(false);
                 }
                 if (sibling.parent != null && sibling.isRight() && sibling.hasLeftChild() && sibling.getLeftChild().isRed()
-                        && ((sibling.hasRightChild() && !sibling.getRightChild().isRed()) || !sibling.hasRightChild())) {
+                   && ((sibling.hasRightChild() && !sibling.getRightChild().isRed()) || !sibling.hasRightChild())) {
                     sibling.swapColor(sibling.getLeftChild());
                     sibling = sibling.rotateRight();
                 }

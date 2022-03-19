@@ -113,7 +113,7 @@ public class TreeRB<T extends Comparable<T>> implements IRedBLackTree<T> {
 
     @Override
     public void delete(T value) {
-        if(!this.isEmpty()){
+        if(root != null){
             root = deleteNode(value, root);
             while (root != null && root.hasParent()) root = root.getParent();
         }
@@ -155,16 +155,17 @@ public class TreeRB<T extends Comparable<T>> implements IRedBLackTree<T> {
             }
 
             if(!(node.hasRightChild() || node.hasLeftChild()) || replacing == null){
-                temp = new Node("0");
+                temp = new Node(0);
                 temp.setColor(false);
                 replacing = temp;
                 replacing.setParent(parent);
-//                boolean left = false;
+
                 if(!(node.hasRightChild() || node.hasLeftChild())) {
                     if(parent != null) left = deleted.isLeft();
                 }
                 if(left && parent != null) parent.setLeftChild(replacing);
-                else if ( parent != null)parent.setRightChild(replacing);
+                else if (parent != null)parent.setRightChild(replacing);
+                else return null;
             }
 //            if (replacing != null)
             replacing = replacing.rebalanceDeletion(deleted);
@@ -190,7 +191,7 @@ public class TreeRB<T extends Comparable<T>> implements IRedBLackTree<T> {
             else System.out.println("color: " + "black");
             System.out.println();
         }
-        if(temp.hasLeftChild()) preOrderTraverse(temp.getLeftChild());
-        if(temp.hasRightChild()) preOrderTraverse(temp.getRightChild());
+        if(temp != null && temp.hasLeftChild()) preOrderTraverse(temp.getLeftChild());
+        if(temp != null && temp.hasRightChild()) preOrderTraverse(temp.getRightChild());
     }
 }
