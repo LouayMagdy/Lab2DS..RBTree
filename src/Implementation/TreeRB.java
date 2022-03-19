@@ -124,6 +124,7 @@ public class TreeRB<T extends Comparable> implements IRedBLackTree<T> {
         int result = node.getValue().compareTo(value);
         boolean deletedSuccessfully = false;
         Node<T> deleted = node, replacing = null, parent = node.getParent(), temp = null;
+        boolean left = false;
         if(result > 0 && node.hasLeftChild()) {return deleteNode(value, node.getLeftChild());}
         if(result < 0 && node.hasRightChild()) {return deleteNode(value, node.getRightChild());}
         else if(result == 0){
@@ -134,30 +135,42 @@ public class TreeRB<T extends Comparable> implements IRedBLackTree<T> {
                 replacing = deleted.getRightChild();
                 parent = deleted.getParent();
                 node.setValue(deleted.getValue());
-                if(deleted.isLeft()) parent.setLeftChild(replacing);
+                if(deleted.isLeft()) {
+                    left = true;
+                    parent.setLeftChild(replacing);
+                }
                 else parent.setRightChild(replacing);
                 if(replacing != null){replacing.setParent(parent);}
+
             }
             else if(node.hasLeftChild() ^ node.hasRightChild()){
                 replacing = node.getLeftChild();
                 if(replacing == null) replacing = node.getRightChild();
                 replacing.setParent(parent);
-                if(deleted.isLeft()) parent.setLeftChild(replacing);
+                if(deleted.isLeft()) {
+                    parent.setLeftChild(replacing);
+                    left  = true;
+                }
                 else parent.setRightChild(replacing);
-            } else{
+            }
+
+            if(!(node.hasRightChild() || node.hasLeftChild()) || replacing == null){
                 temp = new Node(0);
                 temp.setColor(false);
                 replacing = temp;
                 replacing.setParent(parent);
-                boolean left = false;
-                if(parent != null) left = deleted.isLeft();
+//                boolean left = false;
+                if(!(node.hasRightChild() || node.hasLeftChild())) {
+                    if(parent != null) left = deleted.isLeft();
+                }
                 if(left) parent.setLeftChild(replacing);
                 else parent.setRightChild(replacing);
             }
+//            if (replacing != null)
             replacing = replacing.rebalanceDeletion(deleted);
             if(temp != null){
                 if(parent == null) return null;
-                boolean left = temp.isLeft();
+                left = temp.isLeft();
                 if(left) parent.setLeftChild(null);
                 else parent.setRightChild(null);
                 replacing = parent;
