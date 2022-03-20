@@ -1,10 +1,10 @@
 package Implementation;
 
 public class TreeRB<T extends Comparable<T>> implements IRedBLackTree<T> {
-    public Node<T> root;
-    boolean balance;
-    boolean nodeIsLeft;
-    boolean parentIsLeft;
+    private Node<T> root;
+    private boolean balance;
+    private boolean nodeIsLeft;
+    private boolean parentIsLeft;
 
     public TreeRB() {this.root = null; balance = true; nodeIsLeft = true; parentIsLeft = true;}
 
@@ -53,8 +53,6 @@ public class TreeRB<T extends Comparable<T>> implements IRedBLackTree<T> {
         return this.search(value, this.root);
     }
 
-
-
     @Override
     public void insert(T value) { ///////not implemented
         this.root = this.insert(value, this.root);
@@ -70,11 +68,9 @@ public class TreeRB<T extends Comparable<T>> implements IRedBLackTree<T> {
         }
     }
 
-
-
     private Node<T> insert(T value, Node<T> node) {
         if (node == null) {
-            return new Node<T>(value);
+            return new Node<>(value);
         }
 
         int result = node.getValue().compareTo(value);
@@ -155,7 +151,7 @@ public class TreeRB<T extends Comparable<T>> implements IRedBLackTree<T> {
             }
 
             if(!(node.hasRightChild() || node.hasLeftChild()) || replacing == null){
-                temp = new Node(0);
+                temp = new Node(null);
                 temp.setColor(false);
                 replacing = temp;
                 replacing.setParent(parent);

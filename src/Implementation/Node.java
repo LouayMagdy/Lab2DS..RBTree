@@ -114,8 +114,7 @@ public class Node<T extends Comparable>{
                     if(this.isLeft()) this.getParent().getRightChild().setColor(true);
                     else this.getParent().getLeftChild().setColor(true);
                 }
-                if (blackParent)
-                    this.setParent(this.getParent().rebalanceDeletion(deleted));
+                if (blackParent) return this.getParent().rebalanceDeletion(deleted);
                 return this.getParent();
             }
 
